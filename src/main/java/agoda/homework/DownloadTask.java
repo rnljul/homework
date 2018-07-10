@@ -1,11 +1,8 @@
 package agoda.homework;
 
-import agoda.homework.downloader.Downloader;
-import agoda.homework.downloader.impl.FileDownloader;
 import agoda.homework.exceptions.DownloadException;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 
@@ -24,7 +21,7 @@ public class DownloadTask implements Runnable {
         this.downloader = downloader;
     }
 
-    public DownloadTask(CountDownLatch latch, FileDownloader downloader) {
+    public DownloadTask(CountDownLatch latch, Downloader downloader) {
         this(downloader);
         this.latch = latch;
     }
@@ -35,17 +32,12 @@ public class DownloadTask implements Runnable {
         try {
             downloader.download();
         } catch (DownloadException e) {
-            try {
-
-                logger.warn(e.getMessage());
-
-                downloader.cleanup();
-            } catch (IOException e1) {
-                logger.error(e1.getMessage());
-            }
+            logger.warn(e);
         } finally {
-            if(latch != null)
+            if(latch != null) {
                 latch.countDown();
+                logger.debug(String.format("current latch count = [%d]", latch.getCount()));
+            }
         }
 
     }

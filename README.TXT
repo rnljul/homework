@@ -1,9 +1,34 @@
-Application for download data from multiple sources and protocols to local disk.
+Application downloads data from multiple sources and protocols to local disk.
 Application gives list of sources input in the form of urls
 (e.g. http://my.file.com/file, ftp://other.file.com/other, sftp://and.also.this/ending etc)
 
 If source is file, then file will be downloaded in configurable location.
 If source is directory then downloaded file will contain list of names directory content.
+
+
+Project structure
+*****************
+./
+ |
+ test
+ |  |___ 1gb.txt - file for test download data which bigger than memory
+ |
+ config
+ |  |___ app.properties - configuration file
+ |
+ src - directory with source code
+ |
+ build.gradle - build script
+ |
+ gradlew - build script (when gradle not installed)
+ |
+ gradle.bat - build script for windows (when gradle not installed)
+ |
+ settings.gradle - build script settings
+ |
+ README.TXT - this file
+
+
 
 Supported protocols
 *******************
@@ -19,25 +44,10 @@ Application can be extended for support other protocols.
 To extend application we need:
 1. implement 'agoda.homework.streamers.InStreamer' interface,
    implementation examples located in 'agoda.homework.streamers.impl.in' package.
-   It should open InputStream for source Url.
+
 
 2. modify factory method 'createInStreamerByUri' in 'agoda.homework.streamers.Streamers' class.
    This method creates concrete instances of InStreamer for supported protocols.
-
-
-Download process
-****************
-Download process basically implemented by 'agoda.homework.downloader.Downloader' class.
-Downloader class is abstract but it has default download implementation.
-I considered that downloaded data might be bigger than memory, to solve that problem
-i use buffered reading from InputStream.
-There is concrete downloader class 'agoda.homework.downloader.impl.FileDownloader' it implements
-'cleanup' method to remove partial downloaded data from local disk when download process failed.
-
-Downloading executes in parallel mode, application creates download task for each source Url
-and submit it to ThreadPoolExecutor. Then application wait for all sources downloading completed.
-
-Downloaded files will be located in directory specified in configuration file.
 
 
 Configuration
@@ -67,7 +77,7 @@ if gradle installed use follow command
 'gradle clean build'
 
 if not installed you can use
-'gradlew clean build'
+'./gradlew clean build'
 
 test will be automatically executed before build
 
@@ -82,7 +92,7 @@ How to test
 use command
 'gradle clean test'
 or
-'gradlew clean test'
+'./gradlew clean test'
 
 test will be run with limited memory size
 minHeapSize = "20m"
@@ -90,6 +100,8 @@ maxHeapSize = "200m"
 
 reports will be written to 'build/reports/tests/junit-platform/index.html'
 
+Some tests get data in public sftp server demo.wftpserver.com,
+if tests have been run behind proxy server they could failed/
 
 
 How to run

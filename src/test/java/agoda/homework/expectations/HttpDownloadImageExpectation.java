@@ -1,4 +1,4 @@
-package agoda.homework.integration;
+package agoda.homework.expectations;
 
 import org.mockserver.mock.action.ExpectationCallback;
 import org.mockserver.model.HttpRequest;

@@ -1,6 +1,5 @@
 package agoda.homework;
 
-import agoda.homework.downloader.impl.FileDownloader;
 import agoda.homework.streamers.InStreamer;
 import agoda.homework.streamers.OutStreamer;
 import agoda.homework.streamers.Streamers;
@@ -60,7 +59,6 @@ public class Application {
      */
     public void startup(String[] args) throws IOException, InterruptedException {
 
-
         AppProperties appProperties = AppProperties.getInstance();
 
         if (!Files.exists(Paths.get(appProperties.getDestination())))
@@ -75,7 +73,7 @@ public class Application {
 
         // It needs to wait for all sources download completion
         CountDownLatch latch = new CountDownLatch(sources.size());
-
+        logger.debug(String.format("initial latch count = [%d]", latch.getCount()));
 
         // download all sources
         for (String source : sources) {
@@ -88,23 +86,26 @@ public class Application {
 
                 OutStreamer outStreamer = Streamers.createFileOutStreamer(sourceUri);
 
-                DownloadTask task = new DownloadTask(latch, new FileDownloader(inStreamer, outStreamer, sourceUri));
+                DownloadTask task = new DownloadTask(latch, new Downloader(inStreamer, outStreamer));
 
                 executor.execute(task);
 
             } catch (Exception e) {
-                // it needs to awoid block main thread, when error occurred
+                //it needs to awoid block main thread, when error occurred
                 latch.countDown();
-
+                logger.debug(String.format("current latch count = [%d]", latch.getCount()));
                 logger.error(e.getMessage());
             }
 
         }
 
+        logger.debug("waiting for all sources download completion");
+
+        latch.await();
+
         executor.shutdown();
 
-        // wait for all sources download completion
-        latch.await();
+        logger.debug("all sources downloaded");
 
     }
 

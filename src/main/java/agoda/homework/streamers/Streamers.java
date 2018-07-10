@@ -20,13 +20,13 @@ public class Streamers {
     /**
      * Create concrete instance of OutStreamer
      *
-     * @param sourceUri URI file source location
+     * param sourceUri URI file source location
      * @return Concrete OutStreamer
      * @throws MalformedURLException
      */
-    public static OutStreamer createFileOutStreamer(URI sourceUri) throws MalformedURLException {
+    public static OutStreamer createFileOutStreamer(URI source) {
 
-            return new FileOutStreamer(AppUtl.getOutFilePath(sourceUri));
+            return new FileOutStreamer(AppUtl.getOutFilePath(source));
 
     }
 
@@ -49,6 +49,7 @@ public class Streamers {
             switch (protocol.toUpperCase()) {
 
                 case "HTTP" :
+
                 case "HTTPS":
                     return new HttpFileInStreamer(sourceUri.toURL());
 

@@ -1,6 +1,7 @@
-package agoda.homework.streamers;
+package agoda.homework;
 
 import agoda.homework.exceptions.UnsupportedProtocolException;
+import agoda.homework.streamers.Streamers;
 import agoda.homework.streamers.impl.in.FileInStreamer;
 import agoda.homework.streamers.impl.in.FtpFileInStreamer;
 import agoda.homework.streamers.impl.in.HttpFileInStreamer;

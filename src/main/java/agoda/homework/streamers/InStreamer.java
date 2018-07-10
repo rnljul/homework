@@ -9,6 +9,17 @@ import java.io.InputStream;
  */
 public interface InStreamer {
 
+    /**
+     * Method should open connection with source and create InputStream to data can be read
+     *
+     * */
     InputStream openInStream() throws DownloadException;
+
+
+    /**
+     * Method invoked after data was read and should close all opened connection resources
+     */
+    void release();
+
 
 }

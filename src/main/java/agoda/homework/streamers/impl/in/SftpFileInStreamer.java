@@ -2,6 +2,7 @@ package agoda.homework.streamers.impl.in;
 
 import agoda.homework.exceptions.DownloadException;
 import com.jcraft.jsch.*;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -9,12 +10,18 @@ import java.net.URI;
 
 public class SftpFileInStreamer extends FileInStreamer {
 
+    private static org.apache.log4j.Logger logger = Logger.getLogger(SftpFileInStreamer.class);
+
     private final int port;
     private final String host;
     private final String user;
     private final String pass;
     private final String path;
     private final String fileName;
+
+    private ChannelSftp channelSftp;
+    private Session session;
+
 
     public SftpFileInStreamer(URI sourceUri) {
 
@@ -41,11 +48,11 @@ public class SftpFileInStreamer extends FileInStreamer {
 
     }
 
-    private ChannelSftp buildChannelSftp() throws JSchException, SftpException {
+    private void buildChannelSftp() throws JSchException, SftpException {
 
         JSch jsch = new JSch();
 
-        Session session = jsch.getSession(user, host, port);
+        session = jsch.getSession(user, host, port);
         session.setPassword(pass);
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -53,9 +60,8 @@ public class SftpFileInStreamer extends FileInStreamer {
         session.connect();
         Channel channel = session.openChannel("sftp");
         channel.connect();
-        ChannelSftp channelSftp = (ChannelSftp) channel;
+        channelSftp = (ChannelSftp) channel;
         channelSftp.cd(path);
-        return channelSftp;
 
     }
 
@@ -63,9 +69,11 @@ public class SftpFileInStreamer extends FileInStreamer {
     @Override
     public InputStream openInStream() throws DownloadException {
 
+        logger.debug(String.format("Download from [%s] started", sourceUrl));
+
         try {
 
-            ChannelSftp channelSftp = buildChannelSftp();
+            buildChannelSftp();
 
             return new BufferedInputStream(channelSftp.get(fileName));
 
@@ -77,6 +85,17 @@ public class SftpFileInStreamer extends FileInStreamer {
             );
 
         }
+
+    }
+
+
+    @Override
+    public void release() {
+
+        channelSftp.exit();
+        session.disconnect();
+
+        logger.debug(String.format("Download from [%s] finished", sourceUrl));
 
     }
 

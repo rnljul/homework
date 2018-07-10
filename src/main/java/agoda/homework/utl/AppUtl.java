@@ -6,28 +6,27 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class AppUtl {
 
-    public static String getOutFilePath(URI source) throws MalformedURLException {
 
+    public static String getOutFilePath(URI source) {
 
         String scheme = source.getScheme();
+        String path;
 
-        String path = source.toURL().getPath();
+        if(scheme.equals("file")) {
+            path = source.toString().replace("file:", "");
+        } else {
+            path = source.getPath();
+        }
 
-        return String.format(
-                "%s%s%s%s%s",
-                AppProperties.getInstance().getDestination(),
-                File.separator,
-                scheme,
-                '_',
-                path.replace('/', '_')
-        );
+        return AppProperties.getInstance().getDestination() + File.separator + scheme + "_" +
+                path.replace(scheme + "://", "").
+                        replace("/", "_");
 
     }
 

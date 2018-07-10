@@ -1,6 +1,7 @@
 package agoda.homework.streamers.impl.in;
 
 import agoda.homework.exceptions.DownloadException;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.net.URL;
 
 public class HttpFileInStreamer extends FileInStreamer {
 
+    private static Logger logger = Logger.getLogger(HttpFileInStreamer.class);
 
     public HttpFileInStreamer(URL sourceUrl) {
         super(sourceUrl);
@@ -16,6 +18,8 @@ public class HttpFileInStreamer extends FileInStreamer {
 
     @Override
     public InputStream openInStream() throws DownloadException {
+
+        logger.debug(String.format("Download from [%s] started", sourceUrl));
 
         try {
 
