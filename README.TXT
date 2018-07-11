@@ -10,9 +10,6 @@ Project structure
 *****************
 ./
  |
- test
- |  |___ 1gb.txt - file for test download data which bigger than memory
- |
  config
  |  |___ app.properties - configuration file
  |
@@ -25,6 +22,8 @@ Project structure
  gradle.bat - build script for windows (when gradle not installed)
  |
  settings.gradle - build script settings
+ |
+ gradle - drirectory with gradle wrapper
  |
  README.TXT - this file
 
@@ -96,7 +95,7 @@ or
 
 test will be run with limited memory size
 minHeapSize = "20m"
-maxHeapSize = "200m"
+maxHeapSize = "20m"
 
 reports will be written to 'build/reports/tests/junit-platform/index.html'
 

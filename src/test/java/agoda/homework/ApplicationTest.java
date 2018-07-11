@@ -12,12 +12,11 @@ import agoda.homework.utl.AppUtl;
 import org.junit.jupiter.api.*;
 import org.mockserver.integration.ClientAndServer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 
 import static org.mockito.Mockito.*;
@@ -35,8 +34,8 @@ public class ApplicationTest {
     public static final String DIR_SOURCE = "file:./src/test/resources/file";
     public static final String DIR_SOURCE_MD5 = "e22d8dd40a886dd786ccce0a35a6e4a9";
 
-    public static final String BIG_FILE_SOURCE = "file:./test/1gb.txt";
-    public static final String BIG_FILE_MD5 = "cd573cfaace07e7949bc0c46028904ff";
+    public static final String BIG_FILE_SOURCE = "file:./test/bigfile.txt";
+    public static final String BIG_FILE_MD5 = "f5f24b666fea7cc6825ceae8f9750362";
 
     public static final String TEXT_TXT_SOURCE = "http://localhost:1080/download/text.txt";
     public static final String TEXT_TXT_MD5 = "8bd254c98a14a6b305be6117fa04b694";
@@ -48,13 +47,39 @@ public class ApplicationTest {
 
     private ClientAndServer mockServer;
 
+
+    private void createBigFile() throws IOException {
+
+        if (!Files.exists(Paths.get("./test")))
+            Files.createDirectory(Paths.get("./test"));
+
+        byte[] buf = new byte[8192];
+        long n = 1024 * 30000;
+        FileOutputStream fos = new FileOutputStream( "./test/bigfile.txt");
+        long m = n / buf.length;
+        for (long i = 0; i < m; i++) {
+            fos.write(buf, 0, buf.length);
+        }
+        fos.write(buf, 0, (int) (n % buf.length));
+        fos.close();
+
+    }
+
+    private void removeBigFile() throws IOException {
+        Files.delete(Paths.get("./test/bigfile.txt"));
+        Files.delete(Paths.get("./test"));
+    }
+
     @BeforeAll
-    public void setup() {
+    public void setup() throws IOException {
+
+        createBigFile();
+
         mockServer = startClientAndServer(1080);
     }
 
     @AfterAll
-    public void tearDown() {
+    public void tearDown() throws IOException {
         mockServer.stop();
 
         File testDir = new File(AppProperties.getInstance().getDestination());
@@ -67,7 +92,7 @@ public class ApplicationTest {
         }
         testDir.delete();
 
-
+        removeBigFile();
     }
 
 
@@ -112,6 +137,11 @@ public class ApplicationTest {
 
     @Test
     public void whenFileBiggerThanMemory_ThenDownloaded() throws IOException, InterruptedException, NoSuchAlgorithmException, URISyntaxException {
+
+
+
+
+
 
         download(BIG_FILE_SOURCE, BIG_FILE_MD5);
 

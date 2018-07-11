@@ -18,6 +18,7 @@ public class SftpFileInStreamer extends FileInStreamer {
     private final String pass;
     private final String path;
     private final String fileName;
+    private final URI sourceUri;
 
     private ChannelSftp channelSftp;
     private Session session;
@@ -26,6 +27,8 @@ public class SftpFileInStreamer extends FileInStreamer {
     public SftpFileInStreamer(URI sourceUri) {
 
         super(null);
+
+        this.sourceUri = sourceUri;
 
         host = sourceUri.getHost();
         port = sourceUri.getPort();
@@ -69,7 +72,7 @@ public class SftpFileInStreamer extends FileInStreamer {
     @Override
     public InputStream openInStream() throws DownloadException {
 
-        logger.debug(String.format("Download from [%s] started", sourceUrl));
+        logger.debug(String.format("Download from [%s] started", sourceUri));
 
         try {
 
@@ -80,7 +83,7 @@ public class SftpFileInStreamer extends FileInStreamer {
         } catch (JSchException | SftpException e) {
 
             throw new DownloadException(
-                    String.format("Unable to open stream from source location [%s]", sourceUrl.toString()),
+                    String.format("Unable to open stream from source location [%s]", sourceUri),
                     e
             );
 
@@ -95,7 +98,7 @@ public class SftpFileInStreamer extends FileInStreamer {
         channelSftp.exit();
         session.disconnect();
 
-        logger.debug(String.format("Download from [%s] finished", sourceUrl));
+        logger.debug(String.format("Download from [%s] finished", sourceUri));
 
     }
 
